@@ -13,6 +13,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.0.1",
+    "react-input-mask": "^2.0.4",
     "react-widgets": "^5.8.4"
   },
   "devDependencies": {
