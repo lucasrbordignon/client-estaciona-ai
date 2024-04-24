@@ -4,37 +4,10 @@ import { HiClipboardCheck, HiCog, HiOutlineCheckCircle, HiPlus, HiX } from "reac
 import InputMask from 'react-input-mask';
 
 export default function Home() {
-  const cars = [
-    {
-      "id": 1,
-      "numero": 1,
-      "modelo": "Toyota Corolla",
-      "placa": "ABC-1234",
-      "cliente": {
-        "nome": "João da Silva",
-        "telefone": "(11) 98765-4321"
-      }
-    },
-    {
-      "id": 2,
-      "numero": 2,
-      "modelo": "Honda Civic",
-      "placa": "DEF-5678",
-      "cliente": {
-        "nome": "Maria Oliveira",
-        "telefone": "(11) 12345-6789"
-      }
-    },
-    {
-      "id": 3,
-      "numero": 3,
-      "modelo": "Volkswagen Gol",
-      "placa": "GHI-9012",
-      "cliente": {
-        "nome": "Pedro Santos",
-        "telefone": "(11) 98765-4321"
-      }
-    }
+  const initialCars = [
+    {"id":1,"vaga":"A-01","modelo":"Toyota Corolla","placa":"ABC-1234","cliente":{"nome":"João da Silva","telefone":"(11) 98765-4321"}},
+    {"id":2,"vaga":"A-02","modelo":"Honda Civic","placa":"DEF-5678","cliente":{"nome":"Maria Oliveira","telefone":"(11) 12345-6789"}},
+    {"id":3,"vaga":"A-03","modelo":"Volkswagen Gol","placa":"GHI-9012","cliente":{"nome":"Pedro Santos","telefone":"(11) 98765-4321"}}
   ]
   
   const [selectedCar, setSelectedCar] = useState(null)
@@ -42,6 +15,8 @@ export default function Home() {
   const [showAddingPopup, setshowAddingPopup] = useState(false)
   const [selectedValue, setSelectedValue] = useState('')
   const [licensePlate, setlicensePlate] = useState('')
+  const [cars, setCars] = useState(initialCars)
+  const [parkingSpots, setParkingSpots] = useState(["A-04", "A-05", "A-06"])
 
   const handleFinishClick = (carId) => {
     setSelectedCar(carId);
@@ -74,6 +49,36 @@ export default function Home() {
     setlicensePlate(event.target.value.toUpperCase())
   }
 
+  const AddingClick = () => {
+    const vaga = document.querySelector('select').value
+    const placa = document.querySelector('input[name="licensePlate"]').value
+    const modelo = document.getElementById('carModel').value
+    const proprietario = document.getElementById('ownerName').value
+    const celular = document.getElementById('celular').value
+
+    const dados = {
+      id: cars.length + 1,
+      vaga,
+      modelo,
+      placa,
+      cliente: {
+        nome: proprietario,
+        telefone: celular
+      }
+    }
+
+    const updatedParkingSpots = [...parkingSpots]
+    const parkingSpotIndex = updatedParkingSpots.indexOf(vaga)
+
+    updatedParkingSpots.splice(parkingSpotIndex, 1)
+
+    setCars([...cars, dados])
+    setParkingSpots(updatedParkingSpots)
+
+    handleCloseAddingPopup()
+  }
+
+
   return (
     <div className="h-full">
       <div className="h-full w-full">
@@ -101,7 +106,7 @@ export default function Home() {
             <thead className="">
               <tr>
                 <th className="px-4 py-2 bg-zinc-800 rounded-l-lg"></th>
-                <th className="px-4 py-2 bg-zinc-800 text-left">Número</th>
+                <th className="px-4 py-2 bg-zinc-800 text-left">Vaga</th>
                 <th className="px-4 py-2 bg-zinc-800 text-left">Carro</th>
                 <th className="px-4 py-2 bg-zinc-800 text-left">Placa</th>
                 <th className="px-4 py-2 bg-zinc-800 text-left">Nome do Cliente</th>
@@ -117,7 +122,7 @@ export default function Home() {
                       <HiOutlineCheckCircle size={20} className="text-green-600 cursor-pointer hover:text-green-400" />
                     </button>
                   </td>
-                  <td className="border-b border-white/10 px-4 py-2">{car.numero}</td>
+                  <td className="border-b border-white/10 px-4 py-2">{car.vaga}</td>
                   <td className="border-b border-white/10 px-4 py-2">{car.modelo}</td>
                   <td className="border-b border-white/10 px-4 py-2">{car.placa}</td>
                   <td className="border-b border-white/10 px-4 py-2">{car.cliente.nome}</td>
@@ -168,16 +173,19 @@ export default function Home() {
                   <div className="flex flex-col">
                     <label htmlFor="" className="text-zinc-200">Número da vaga</label>
                     <select value={selectedValue} onChange={handleChange} className="bg-zinc-800 border border-zinc-700 py-1.5 px-2 rounded"> 
-                      <option value="1">1</option> 
-                      <option value="2">2</option> 
-                      <option value="3">3</option> 
+                      {
+                        parkingSpots.map((parkingSpot, index) => (
+                          <option key={index} value={parkingSpot}>{parkingSpot}</option> 
+                         )
+                        )
+                      }                       
                     </select>
                   </div>
 
                   <div className="flex flex-col">
                     <label htmlFor="licensePlate" className="text-zinc-200">Placa do Carro</label>
-                    <InputMask type="text" name="licensePlate" mask="aaa9a99"  value={licensePlate} onChange={handlelicensePlateChange} className="bg-zinc-800 border border-zinc-700 py-1 px-2 rounded text-base">
-                      {(inputProps) => <input {...inputProps} id="licensePlate" />}
+                    <InputMask type="text" name="licensePlate" mask="aaa9a99"  maskChar="" value={licensePlate} onChange={handlelicensePlateChange} className="bg-zinc-800 border border-zinc-700 py-1 px-2 rounded text-base no-underline">
+                      {(inputProps) => <input {...inputProps} id="licensePlate"/>}
                     </InputMask>
                   </div>
 
@@ -193,7 +201,7 @@ export default function Home() {
 
                   <div className="flex flex-col">
                     <label htmlFor="celular" className="text-zinc-200">Celular</label>
-                    <InputMask type="text" mask="(99) 99999-9999" className="bg-zinc-800 border border-zinc-700 py-1 px-2 rounded text-base">
+                    <InputMask type="text" mask="(99) 99999-9999" maskChar="" className="bg-zinc-800 border border-zinc-700 py-1 px-2 rounded text-base">
                       {(inputProps) => <input {...inputProps} id="celular" />}
                     </InputMask>
                   </div>
@@ -201,7 +209,7 @@ export default function Home() {
 
                 <div className="flex justify-end gap-2"> 
                   <button onClick={handleCloseAddingPopup} className="px-4 py-2 bg-zinc-300 font-semibold transform transition-colors text-zinc-900 border border-white/10 rounded-lg hover:border-red-900 hover:cursor-pointer hover:bg-red-300 hover:shadow">Cancelar</button>                             
-                  <button className="px-4 py-2 bg-green-500 border-green-900 font-semibold text-zinc-900 border transform transition-colors rounded-lg hover:border-white/30 hover:cursor-pointer hover:border-green-400  hover:shadow">Adicionar</button>
+                  <button onClick={AddingClick} className="px-4 py-2 bg-green-500 border-green-900 font-semibold text-zinc-900 border transform transition-colors rounded-lg hover:border-white/30 hover:cursor-pointer hover:border-green-400  hover:shadow">Adicionar</button>
                 </div>
               </div>
             </div>
